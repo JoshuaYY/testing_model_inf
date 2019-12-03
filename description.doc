@@ -1,0 +1,12 @@
+Big Picture:
+Design a neural network with trained parameters for sampling test.(DNN & CNN included)
+
+Design detail:
+1. Given input(must be preprocessed before check tensorflow)
+2. Gvien layer information(hidden nodes, type)
+3.Training parameters(must figure out the weights and bias)
+
+functions:
+a. model build:
+	input parameters: training parameters(weights & bias, check the shape of training parameters); 
+	operation: extract dimensions of parameters.
