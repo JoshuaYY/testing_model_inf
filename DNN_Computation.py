@@ -1,12 +1,14 @@
 import numpy as np
 import Test_Model as TM
 
-def build_model(P, A):
+def build_model(P, A, TFP=False):
 	"""test model configuration with given parameters
 	   Input: P-matrix in this form:[W, B, W, B,...], size must be even number, pay attention to dimension match
 	   		  A-list collection of activation function type
 	   Output: a test model consisting of all hidden layers with training parameters
 	"""
+	if TFP:
+		P = row2col(P)
 	test = TM.Test_Model()
 	L_P = len(P) # length of parameters
 	L_A = len(A) # length of activations
@@ -17,7 +19,14 @@ def build_model(P, A):
 		test.add_layer(P[2*i], P[2*i + 1], A[i])
 	return test
   
-
+# this func aims to reshape the parameters from tensorflow which uses this equation: z' = a' * w' + b'(row_dim  directed)
+def row2col(P):
+	for i in range(len(P)):
+		if i & 1:
+			P[i] = np.reshape(P[i], (P[i].shape[0], 1))
+		else:
+			P[i] = np.transpose(np.array(P[i]))
+	return P
 
 
 

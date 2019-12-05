@@ -51,3 +51,8 @@ if __name__ == "__main__":
 	print(len(model1))
 	model1.remove_layer(4)
 	print(len(model1))
+
+
+
+
+
