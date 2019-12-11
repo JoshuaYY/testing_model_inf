@@ -4,7 +4,7 @@ import Layer as Ly
 class Conv2D_Layer(Ly.Layer):
 	"""
 	Design a convolutional layer(filter) to store Conv2D filter.
-	Initialization Parameter: F-3D Matrix; B-1D array with length same as the channel of F; activation-non linear function(0:'linear', 1:'relu', 2:'sigmoid', 3:'tanh', 4:'softmax'); strides-a 2-element array specify the sliding steps horizontally and vertically; padding-two possible strings choice('valid' vs 'same') with 'valid' to shrink the size of input and 'same' to keep the size of it
+	Initialization Parameter: F-4D Matrix([height, width, channel, number]); B-1D array with length same as the channel of F; activation-non linear function(0:'linear', 1:'relu', 2:'sigmoid', 3:'tanh', 4:'softmax'); strides-a 2-element array specify the sliding steps horizontally and vertically; padding-two possible strings choice('valid' vs 'same') with 'valid' to shrink the size of input and 'same' to keep the size of it
 	"""
 	def __init__(self, F, B, activation, strides, padding, Noise=None):
 		super(Conv2D_Layer, self).__init__(F, B, activation, Noise)
@@ -42,15 +42,24 @@ class Conv2D_Layer(Ly.Layer):
 	# with given input, to calculate output with the parameters
 	# input must be in numpy type
 	def computing(self, inp):
-		size = inp.shape
+		size = inp.shape  # size shoud be like (num, height, width, channle)
+		
+		# the physical dimension of input must be non-negative	
 		for i in range(len(size)):
 			if size[i] <= 0:
 				print('invalid input dimension')
 				return None
-		in_size, in_height, in_width, in_channel = inp[0], inp[1], inp[2], inp[3]
-		stride_height, stride_width = self._strides[0], self._strides[1]
-		filter_size = self._weights.shape
-		filter_height, filter_width = filter_size[0], filter_size[1]
+		
+		in_size, in_height, in_width, in_channel = size[0], size[1], size[2], size[3] # get the 4 dimensions of input individually
+		stride_height, stride_width = self._strides[0], self._strides[1] # get the move step along height and width separately
+		filter_size = self._weights.shape # 4 dimensions of filter
+		filter_height, filter_width, filter_num = filter_size[0], filter_size[1], filter_size[3] # get the height and width of filter separately
+		pad_top = 0
+		pad_bottom = 0
+		pad_left = 0
+		pad_right = 0
+		
+		# padding method to add additional 0 columns and arrays on the input
 		if self._padding == 'same':
 			if in_height % stride_height == 0:
 				pad_along_height = max(filter_height - stride_height, 0)
@@ -60,9 +69,56 @@ class Conv2D_Layer(Ly.Layer):
 				pad_along_width = max(filter_width - stride_width, 0)
 			else:
 				pad_along_width = max(filter_width - (in_width % stride_width), 0)
+			
+			pad_top = pad_along_height // 2
+			pad_bottom = pad_along_height - pad_top
+			pad_left = pad_along_width // 2
+			pad_right = pad_along_width - pad_left
+     	
+		# dimensions of the output
+		height_after_padding = in_height + pad_top + pad_bottom
+		out_height = ((height_after_padding - filter_height) // stride_height) + 1
 
+		width_after_padding = in_width + pad_left + pad_right
+		out_width = ((width_after_padding - filter_width) // stride_width) + 1
 
+		output = np.array([[[[0]*filter_num for _ in range(out_width)] for _ in range(out_height)] for _ in range(in_size)])
+		for i in range(in_size):
+			image = inp[i]	# individual image in size [height, width, channel]
+			temp = np.array([[[0]*filter_num for _ in range(out_width)] for _ in range(out_height)]) # Temparary list to store the output of individual image
 
+			# index of result convolution matrix
+			move_height = 0 # height direction movement
+			
+			ceil = 0 - pad_top
+			bottom = filter_height - pad_top - 1
+			while bottom < in_height + pad_bottom:
+				height_s = max(0, ceil)
+				height_e = min(in_height-1, bottom)
+
+				move_width = 0 # width direction movement
+				left = 0 - pad_left
+				right = filter_width - pad_left - 1
+
+				while right < in_width + pad_right:
+					width_s = max(0, left)
+					width_e = min(in_width-1, right)
+					result = np.array([0*filter_num]) # filter result of each point 
+					for h in range(height_s, height_e + 1):
+						for w in range(width_s, width_e + 1):
+							target_point = image[h][w] # individual point channel of each image imput
+							filter_corresponded = self._weights[h-height_s][w-width_s] # the corresponding filter in shape[channel, size]
+							result = np.add(np.dot(target_point, filter_corresponded), result)
+					temp[move_height][move_width] = result
+					left += stride_width
+					right += stride_width
+					move_width += 1
+				ceil += stride_height
+				bottom += stride_height
+				move_width += 1
+			output[i] = temp
+		
+		return output
 
 #Test Cases:
 FIL = np.array([[[1, 2, 4], [2, 5, 6]], [[2, 5, 6], [8, 10, 17]]])
@@ -84,3 +140,15 @@ convLayer.change_padding('non_valid')
 convLayer.change_activation(8)
 print(convLayer.show_activation())
 print(convLayer.get_name())
+
+# cases to test computing func only
+inp = np.array([[[[1, 2, 3], [2, 3, 5], [2, 7, 9]], [[3, 6, 8], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, 10], [3, 5, 10]]]])
+#fil = np.array([[[[1, 2], [6, 0], [2, 5]]], [[[2, 7], [1, 0], [3, 10]]]])
+fil = np.array([[[[1, 1], [1, 1], [1, 1]]], [[[1, 1], [1, 1], [1, 1]]]])
+
+strides = (2, 2)
+padding = 'same'
+Conv2D = Conv2D_Layer(fil, 0, 0, strides, padding) 
+res = Conv2D.computing(inp)
+print(res.shape)
+print(res)
