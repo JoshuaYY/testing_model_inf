@@ -1,5 +1,6 @@
 import numpy as np
 import Layer as Ly
+import Activations as Act
 
 class Conv2D_Layer(Ly.Layer):
 	"""
@@ -85,7 +86,7 @@ class Conv2D_Layer(Ly.Layer):
 		output = np.array([[[[0]*filter_num for _ in range(out_width)] for _ in range(out_height)] for _ in range(in_size)])
 		for i in range(in_size):
 			image = inp[i]	# individual image in size [height, width, channel]
-			temp = np.array([[[0]*filter_num for _ in range(out_width)] for _ in range(out_height)]) # Temparary list to store the output of individual image
+			temp = np.array([[[0]*filter_num for _ in range(out_width)] for _ in range(out_height)]) # Temporary list to store the output of individual image
 
 			# index of result convolution matrix
 			move_height = 0 # height direction movement
@@ -103,19 +104,31 @@ class Conv2D_Layer(Ly.Layer):
 				while right < in_width + pad_right:
 					width_s = max(0, left)
 					width_e = min(in_width-1, right)
-					result = np.array([0*filter_num]) # filter result of each point 
+					result = np.array([[0]*filter_num]) # filter result of each point 
 					for h in range(height_s, height_e + 1):
 						for w in range(width_s, width_e + 1):
 							target_point = image[h][w] # individual point channel of each image imput
 							filter_corresponded = self._weights[h-height_s][w-width_s] # the corresponding filter in shape[channel, size]
 							result = np.add(np.dot(target_point, filter_corresponded), result)
+					result = np.add(result, self._biases)
+					if self._activation == 1:
+						result = Act.act_relu(result)
+					elif self._activation == 2:
+						result = Act.act_sigm(result)
+					elif self._activation == 3:
+						result = Act.act_tanh(result)
+					elif self._activation == 0:
+						result = result
+					else:
+						print('undefined activation or activation not applicabel to Conv Layer')
+						return None
 					temp[move_height][move_width] = result
 					left += stride_width
 					right += stride_width
 					move_width += 1
 				ceil += stride_height
 				bottom += stride_height
-				move_width += 1
+				move_height += 1
 			output[i] = temp
 		
 		return output
@@ -142,13 +155,13 @@ print(convLayer.show_activation())
 print(convLayer.get_name())
 
 # cases to test computing func only
-inp = np.array([[[[1, 2, 3], [2, 3, 5], [2, 7, 9]], [[3, 6, 8], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, 10], [3, 5, 10]]]])
-#fil = np.array([[[[1, 2], [6, 0], [2, 5]]], [[[2, 7], [1, 0], [3, 10]]]])
-fil = np.array([[[[1, 1], [1, 1], [1, 1]]], [[[1, 1], [1, 1], [1, 1]]]])
+inp = np.array([[[[1, 2, -53], [2, 3, -55], [2, 7, -109]], [[3, 6, -88], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, -100], [3, 5, 10]]], [[[1, 2, 3], [2, 3, 5], [2, 7, 9]], [[3, 6, 8], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, 10], [3, 5, 10]]]])
+fil = np.array([[[[1, 2], [6, 0], [2, 5]]], [[[2, 7], [1, 0], [3, 10]]]])
+#fil = np.array([[[[1, 1], [1, 1], [1, 1]]], [[[1, 1], [1, 1], [1, 1]]]])
 
 strides = (2, 2)
 padding = 'same'
-Conv2D = Conv2D_Layer(fil, 0, 0, strides, padding) 
+Conv2D = Conv2D_Layer(fil, np.array([2, 1]), 1, strides, padding) 
 res = Conv2D.computing(inp)
 print(res.shape)
 print(res)
