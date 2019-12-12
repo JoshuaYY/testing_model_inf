@@ -1,6 +1,7 @@
 import numpy as np
 import Layer as Ly
 import Activations as Act
+import useful_functions as USF
 
 class Conv2D_Layer(Ly.Layer):
 	"""
@@ -54,27 +55,13 @@ class Conv2D_Layer(Ly.Layer):
 		in_size, in_height, in_width, in_channel = size[0], size[1], size[2], size[3] # get the 4 dimensions of input individually
 		stride_height, stride_width = self._strides[0], self._strides[1] # get the move step along height and width separately
 		filter_size = self._weights.shape # 4 dimensions of filter
-		filter_height, filter_width, filter_num = filter_size[0], filter_size[1], filter_size[3] # get the height and width of filter separately
-		pad_top = 0
-		pad_bottom = 0
-		pad_left = 0
-		pad_right = 0
+		filter_height, filter_width, filter_channel, filter_num = filter_size[0], filter_size[1], filter_size[2], filter_size[3] # get the height and width of filter separately
+		if in_channel != filter_channel:
+			print("channel does not match")
+			return None
 		
 		# padding method to add additional 0 columns and arrays on the input
-		if self._padding == 'same':
-			if in_height % stride_height == 0:
-				pad_along_height = max(filter_height - stride_height, 0)
-			else:
-				pad_along_height = max(filter_height - (in_height % stride_height), 0)
-			if in_width % stride_width == 0:
-				pad_along_width = max(filter_width - stride_width, 0)
-			else:
-				pad_along_width = max(filter_width - (in_width % stride_width), 0)
-			
-			pad_top = pad_along_height // 2
-			pad_bottom = pad_along_height - pad_top
-			pad_left = pad_along_width // 2
-			pad_right = pad_along_width - pad_left
+		pad_top, pad_bottom, pad_left, pad_right = USF.padding(self._padding, in_height, in_width, stride_height, stride_width, filter_height, filter_width)
      	
 		# dimensions of the output
 		height_after_padding = in_height + pad_top + pad_bottom
@@ -159,7 +146,7 @@ inp = np.array([[[[1, 2, -53], [2, 3, -55], [2, 7, -109]], [[3, 6, -88], [1, 7, 
 fil = np.array([[[[1, 2], [6, 0], [2, 5]]], [[[2, 7], [1, 0], [3, 10]]]])
 #fil = np.array([[[[1, 1], [1, 1], [1, 1]]], [[[1, 1], [1, 1], [1, 1]]]])
 
-strides = (2, 2)
+strides = (1, 2)
 padding = 'same'
 Conv2D = Conv2D_Layer(fil, np.array([2, 1]), 1, strides, padding) 
 res = Conv2D.computing(inp)
