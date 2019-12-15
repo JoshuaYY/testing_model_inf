@@ -19,7 +19,7 @@ def build_model(P, A, TFP=False):
 		test.add_layer(P[2*i], P[2*i + 1], A[i])
 	return test
   
-# this func aims to reshape the parameters from tensorflow which uses this equation: z' = a' * w' + b'(row_dim  directed)
+# this func aims to reshape the parameters from tensorflow which uses this equation: z' = a' * w' + b'(row_dim oriented)
 def row2col(P):
 	for i in range(len(P)):
 		if i & 1:
@@ -29,7 +29,7 @@ def row2col(P):
 	return P
 
 
-
+"""
 #test cases:
 activations = [1, 2, 4]
 inp = [[1, 2.0, 3.5, 6.04], [-0.5, 6.4, 8.1, -2.3]]
@@ -43,3 +43,4 @@ P = [W1, B1, W2, B2, W3, B3]
 model = build_model(P, activations)
 result = model.computing(inp)
 print(result)
+"""

@@ -157,13 +157,14 @@ print(max_pooling.get_strides())
 print(max_pooling.get_padding())
 max_pooling.change_padding('non_linear')
 max_pooling.change_type(10)
-"""
+
 # cases to test computing func only
 #inp = np.array([[[[1, 2, -53], [2, 3, -55], [2, 7, -109]], [[3, 6, -88], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, -100], [3, 5, 10]]], [[[1, 2, 3], [2, 3, 5], [2, 7, 9]], [[3, 6, 8], [1, 7, 0], [0, 3, 1]], [[3, 5, 7], [9, 0, 10], [3, 5, 10]]]])
 inp = np.array([[[[1, 2, 3], [2, 4, 6], [2, 7, 90]], [[34, 5, 0], [4, 5, 9], [5, 0, 3]], [[2, 6, 45], [9, 3, 10], [5, 67, 4]]]])
 strides = (2, 1)
 padding = 'same'
-pooling_size = (1, 2)
+pooling_size = (11, 2)
 
 pooling_layer = pooling2D(pooling_size, strides, padding, 0)
 print(pooling_layer.computing(inp))
+"""

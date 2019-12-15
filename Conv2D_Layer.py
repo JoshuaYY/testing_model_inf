@@ -120,6 +120,7 @@ class Conv2D_Layer(Ly.Layer):
 		
 		return output
 
+"""
 #Test Cases:
 FIL = np.array([[[1, 2, 4], [2, 5, 6]], [[2, 5, 6], [8, 10, 17]]])
 bias = np.array([1, 4, 5])
@@ -152,3 +153,4 @@ Conv2D = Conv2D_Layer(fil, np.array([2, 1]), 1, strides, padding)
 res = Conv2D.computing(inp)
 print(res.shape)
 print(res)
+"""

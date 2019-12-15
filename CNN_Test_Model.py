@@ -7,7 +7,7 @@ class CNN_Test_Model(TM.Test_Model):
 	
 	global allowed_padding
 	allowed_padding = ('valid', 'same')
-	def __init(self):
+	def __init__(self):
 		super(CNN_Test_Model, self).__init__()
 
 
@@ -27,7 +27,7 @@ class CNN_Test_Model(TM.Test_Model):
 		new_Conv2D_Layer = CLY.Conv2D_Layer(F, B, activation, strides, padding)
 		target_layer.pre.next = new_Conv2D_Layer
 		new_Conv2D_Layer.pre = target_layer.pre
-		target_layer.pre = new_layer
+		target_layer.pre = new_Conv2D_Layer
 		new_Conv2D_Layer.next = target_layer
 		self._size += 1
 
@@ -47,7 +47,7 @@ class CNN_Test_Model(TM.Test_Model):
 		new_Pooling_Layer = PL2.pooling2D(pooling_size, strides, padding, method)
 		target_layer.pre.next = new_Pooling_Layer
 		new_Pooling_Layer.pre = target_layer.pre
-		target_layer.pre = new_Pooing_Layer
+		target_layer.pre = new_Pooling_Layer
 		new_Pooling_Layer.next = target_layer
 		self._size += 1
 		
@@ -57,21 +57,9 @@ class CNN_Test_Model(TM.Test_Model):
 		current_input = np.array(samples)
 		current_layer = self._head.next
 		while current_layer.next is not None:
-			name = current_layer.get_name()
-			if name == 'conv2D':
-				output = self._conv2D_computing(current_layer, current_input)
-			elif name == 'pooling'
-				output = self._pooling2D_computing(current_layer, current_input)
-			else:
-				print("undefined layer type")
-				return
+			output = current_layer.computing(current_input)
 			current_input = output
 			current_layer = current_layer.next
-
-		
-
-
-
-
+		return output
 
 
