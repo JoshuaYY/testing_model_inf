@@ -19,6 +19,8 @@ model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
 model.add(layers.Flatten())
 model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(32, activation='sigmoid'))
+
 model.add(layers.Dense(10, activation='softmax'))
 
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -36,12 +38,15 @@ import useful_functions as USF
 
 MY_CNN_Model, MY_DNN_Model = CCN.build_model(layers, weights)
 
-small_test = test_images[:100]
+small_test = test_images[:1000]
 Conv_Result = MY_CNN_Model.computing(small_test)
 Dense_Input = USF.Flatten(Conv_Result)
 my_prediction = MY_DNN_Model.computing(np.transpose(Dense_Input))
+my_prediction = np.transpose(my_prediction)
+print(my_prediction[0])
+print(prediction[0])
 
-np.testing.assert_allclose(prediction[:100], np.transpose(my_prediction), rtol=1e-6, atol=1e-6)
+np.testing.assert_allclose(my_prediction, prediction[:1000], rtol=1e-6, atol=1e-6)
 
 
 

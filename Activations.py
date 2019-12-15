@@ -3,7 +3,7 @@ import numpy as np
 def act_relu(res):
 	"""treat matrix res element wise to mute negatives
 	"""
-	res[res<0] = 0
+	res[res<0] = 0.
 	return res
 
 #test case:
@@ -15,7 +15,7 @@ assert np.array_equal(act_relu(t), np.array([[1.02, 2.94], [0, 0]])) == False
 def act_sigm(res):
 	"""fix each element of res to range(0, 1)
 	"""
-	activation_func = lambda x: 1 /(1 + np.exp(-x))
+	activation_func = lambda x: 1. /(1. + np.exp(-x))
 	return activation_func(res)
 
 #test case:

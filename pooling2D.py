@@ -94,10 +94,10 @@ class pooling2D(object):
 		width_after_padding = in_width + pad_left + pad_right
 		out_width = ((width_after_padding - pooling_width) // stride_width) + 1
 
-		output = np.array([[[[0]*in_channel for _ in range(out_width)] for _ in range(out_height)] for _ in range(in_size)])
+		output = np.array([[[[0.]*in_channel for _ in range(out_width)] for _ in range(out_height)] for _ in range(in_size)])
 		for i in range(in_size):
 			image = inp[i]	# individual image in size [height, width, channel]
-			temp = np.array([[[0]*in_channel for _ in range(out_width)] for _ in range(out_height)]) # Temporary list to store the output of individual image
+			temp = np.array([[[0.]*in_channel for _ in range(out_width)] for _ in range(out_height)]) # Temporary list to store the output of individual image
 
 			# index of result convolution matrix
 			move_height = 0 # height direction movement
@@ -116,7 +116,7 @@ class pooling2D(object):
 				while right < in_width + pad_right:
 					width_s = max(0, left)
 					width_e = min(in_width-1, right)
-					result = np.array([[0]*in_channel]) # filter result of each point 
+					result = np.array([[0.]*in_channel]) # filter result of each point 
 					
 					if self._type == 0: # maxpooling implementation 
 						# check whether or not padding method influence the current maximum method

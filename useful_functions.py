@@ -26,7 +26,7 @@ def Flatten(conv_result):
 
 	size, height, width, channel = dimension[0], dimension[1], dimension[2], dimension[3]
 
-	dnn_result = np.array([[0] * (height * width * channel) for _ in range(size)])
+	dnn_result = np.array([[0.] * (height * width * channel) for _ in range(size)])
 
 	# func to concatenate the whole 3D data
 	def combine(elements):
@@ -45,6 +45,6 @@ def Flatten(conv_result):
 	return dnn_result
 """
 #test case:
-C = np.array([[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]], [[19, 20, 21], [22, 23, 24], [25, 26, 27]]]])
+C = np.array([[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]], [[19, 20, 21], [22, 23, 24], [25, 26, 27]]], [[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]], [[19, 20, 21], [22, 23, 24], [25, 26, 27]]]])
 print(Flatten(C))
 """
